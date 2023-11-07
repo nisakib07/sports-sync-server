@@ -28,6 +28,14 @@ async function run() {
       .db("allInformation")
       .collection("myBookingCollection");
 
+    //   Service Collection
+
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
+
     app.get("/services", async (req, res) => {
       const result = await serviceCollection.find().toArray();
       res.send(result);
