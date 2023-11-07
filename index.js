@@ -99,6 +99,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/pendingWorks", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { serviceProviderEmail: req.query.email };
+      }
+      const result = await myBookingCollection.find(query).toArray();
+      res.send(result);
+    });
+
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
