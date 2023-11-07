@@ -64,8 +64,6 @@ async function run() {
       res.send(result);
     });
 
-    // myBooking
-
     app.put("/services/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -84,9 +82,20 @@ async function run() {
       res.send(result);
     });
 
+    // myBooking
+
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
       const result = await myBookingCollection.insertOne(booking);
+      res.send(result);
+    });
+
+    app.get("/bookings", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { userEmail: req.query.email };
+      }
+      const result = await myBookingCollection.find(query).toArray();
       res.send(result);
     });
 
