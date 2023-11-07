@@ -66,6 +66,24 @@ async function run() {
 
     // myBooking
 
+    app.put("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const body = req.body;
+      const updatedService = {
+        $set: {
+          ...body,
+        },
+      };
+      const options = { upsert: true };
+      const result = await serviceCollection.updateOne(
+        filter,
+        updatedService,
+        options
+      );
+      res.send(result);
+    });
+
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
       const result = await myBookingCollection.insertOne(booking);
