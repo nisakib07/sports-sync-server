@@ -49,13 +49,6 @@ const verifyToken = (req, res, next) => {
 
 async function run() {
   try {
-    // await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-
     const serviceCollection = client
       .db("allInformation")
       .collection("services");
@@ -102,12 +95,6 @@ async function run() {
     });
 
     app.get("/userService", verifyToken, async (req, res) => {
-      console.log("owner", req.user);
-      console.log(req.query.email);
-
-      // if (req?.user?.email !== req?.query?.email) {
-      //   return res.status(403).send({ message: "Forbidden Access" });
-      // }
       let query = {};
       if (req.query?.email) {
         query = { serviceProviderEmail: req.query.email };
@@ -198,6 +185,11 @@ async function run() {
       const result = await featureCollection.find().toArray();
       res.send(result);
     });
+
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
