@@ -8,7 +8,10 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "https://assignmentb8-11.web.app",
+      "https://assignmentb8-11.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
@@ -46,7 +49,7 @@ const verifyToken = (req, res, next) => {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -102,9 +105,9 @@ async function run() {
       console.log("owner", req.user);
       console.log(req.query.email);
 
-      //   if (req.user.email !== req.query.email) {
-      //     return res.status(403).send({ message: "Forbidden Access" });
-      //   }
+      // if (req?.user?.email !== req?.query?.email) {
+      //   return res.status(403).send({ message: "Forbidden Access" });
+      // }
       let query = {};
       if (req.query?.email) {
         query = { serviceProviderEmail: req.query.email };
