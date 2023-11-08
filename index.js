@@ -27,6 +27,23 @@ const client = new MongoClient(uri, {
   },
 });
 
+// Token Verification middleware
+
+const verifyToken = (req, res, next) => {
+  const token = req?.cookies?.token;
+  if (!token) {
+    return res.status(401).send({ message: "Unauthorized Access" });
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.send({ message: "Unauthorized Access" });
+    }
+    req.user = decoded;
+    next();
+  });
+  //   next();
+};
+
 async function run() {
   try {
     const serviceCollection = client
@@ -70,8 +87,13 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/userService", async (req, res) => {
-      console.log("cookies", req.cookies);
+    app.get("/userService", verifyToken, async (req, res) => {
+      console.log("owner", req.user);
+      console.log(req.query.email);
+
+      //   if (req.user.email !== req.query.email) {
+      //     return res.status(403).send({ message: "Forbidden Access" });
+      //   }
       let query = {};
       if (req.query?.email) {
         query = { serviceProviderEmail: req.query.email };
@@ -80,21 +102,21 @@ async function run() {
       res.send(result);
     });
 
-    app.delete("/services/:id", async (req, res) => {
+    app.delete("/services/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await serviceCollection.deleteOne(query);
       res.send(result);
     });
 
-    app.get("/services/:id", async (req, res) => {
+    app.get("/services/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await serviceCollection.findOne(query);
       res.send(result);
     });
 
-    app.put("/services/:id", async (req, res) => {
+    app.put("/services/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const body = req.body;
@@ -114,13 +136,13 @@ async function run() {
 
     // myBooking
 
-    app.post("/bookings", async (req, res) => {
+    app.post("/bookings", verifyToken, async (req, res) => {
       const booking = req.body;
       const result = await myBookingCollection.insertOne(booking);
       res.send(result);
     });
 
-    app.get("/bookings", async (req, res) => {
+    app.get("/bookings", verifyToken, async (req, res) => {
       let query = {};
       if (req.query?.email) {
         query = { userEmail: req.query.email };
@@ -129,7 +151,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/pendingWorks", async (req, res) => {
+    app.get("/pendingWorks", verifyToken, async (req, res) => {
       let query = {};
       if (req.query?.email) {
         query = { serviceProviderEmail: req.query.email };
@@ -138,7 +160,7 @@ async function run() {
       res.send(result);
     });
 
-    app.put("/bookings/:id", async (req, res) => {
+    app.put("/bookings/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const body = req.body;
